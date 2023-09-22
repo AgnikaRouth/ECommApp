@@ -10,7 +10,7 @@ router.post('/register', async (req, res) => {
 		email: req.body.email,
 		password: CryptoJS.AES.encrypt(
 			req.body.password,
-			process.env.PASS_SEC
+			process.env.PASS_SEC //secret key
 		).toString(),
 	});
 
@@ -18,7 +18,7 @@ router.post('/register', async (req, res) => {
 		const savedUser = await newUser.save();
 		res.status(201).json(savedUser);
 	} catch (err) {
-		res.status(500).json(err);
+		res.status(500).json({ error: 'An internal server error occurred.' });
 	}
 });
 
@@ -26,23 +26,21 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
 	try {
-		const user = await User.findOne({
-			userName: req.body.user_name,
-		});
+		//mongodb object will be stored in user variable if the username is present
+		const user = await User.findOne({ username: req.body.username });
 
-		!user && res.status(401).json('Wrong User Name');
+		!user && res.status(401).json('Wrong credentials');
 
 		const hashedPassword = CryptoJS.AES.decrypt(
 			user.password,
 			process.env.PASS_SEC
 		);
-
 		const originalPassword = hashedPassword.toString(CryptoJS.enc.Utf8);
+		originalPassword !== req.body.password &&
+			res.status(401).json('Wrong Credentials');
 
-		const inputPassword = req.body.password;
-
-		originalPassword != inputPassword && res.status(401).json('Wrong Password');
-
+		// create JWT (for update/delete) :
+		// values are from mongoDB key names
 		const accessToken = jwt.sign(
 			{
 				id: user._id,
@@ -52,10 +50,12 @@ router.post('/login', async (req, res) => {
 			{ expiresIn: '3d' }
 		);
 
-		const { password, ...others } = user._doc;
+		// hide password from the response and pass accessToken !?
+		const { password, ...others } = user._doc; //in mongoDB, the data are stored in "_doc" location
+
 		res.status(200).json({ ...others, accessToken });
 	} catch (err) {
-		res.status(500).json(err);
+		res.status(500).json({ error: 'An internal server error occurred.' });
 	}
 });
 
