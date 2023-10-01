@@ -40,8 +40,10 @@ const Center = styled.div`
 	flex: 1;
 	text-align: center;
 `;
-const Logo = styled.h2`
-	font-weight: bold;
+const Logo = styled.h1`
+	font-weight: 600;
+	color: #f261b6;
+	font-size: 20px;
 `;
 
 const Right = styled.div`
@@ -69,7 +71,7 @@ const Navbar = () => {
 					</SearchContainer>
 				</Left>
 				<Center>
-					<Logo>ABHISHEK retail</Logo>
+					<Logo>L'AMOUR</Logo>
 				</Center>
 				<Right>
 					<MenuItem>Register</MenuItem>
