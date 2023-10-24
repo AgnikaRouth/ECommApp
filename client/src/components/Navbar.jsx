@@ -43,7 +43,6 @@ const Center = styled.div`
 const Logo = styled.h1`
 	font-weight: 600;
 	color: #f261b6;
-	font-size: 20px;
 `;
 
 const Right = styled.div`
